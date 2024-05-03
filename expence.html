@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+    .expense-tracker {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        border: 1px solid #d7afb6;
+        border-radius: 5px;
+        background-color: #7e7171;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+    
+    .input-section {
+        margin-bottom: 20px;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    
+    input[type="number"] {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #958d8d;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+    
+    button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+    }
+    
+    button:hover {
+        background-color: #0056b3;
+    }
+    
+    .summary {
+        margin-bottom: 20px;
+    }
+    
+    .chart {
+        margin-bottom: 20px;
+    }
+    
+</style>
+<body>
+    <div class="expense-tracker">
+        <h1>Expense Tracker</h1>
+        <div class="input-section">
+            <label for="income">Income:</label>
+            <input type="number" id="income" placeholder="Enter your income">
+            <label for="expense">Expense:</label>
+            <input type="number" id="expense" placeholder="Enter your expense">
+            <button onclick="addTransaction()">Add Transaction</button>
+        </div>
+        <div class="summary">
+            <h2>Summary</h2>
+            <p>Total Income: <span id="totalIncome">0</span></p>
+            <p>Total Expenses: <span id="totalExpenses">0</span></p>
+            <p>Balance: <span id="balance">0</span></p>
+        </div>
+        <div class="chart">
+            <canvas id="myChart"></canvas>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const incomeInput = document.getElementById("income");
+            const expenseInput = document.getElementById("expense");
+            const totalIncomeDisplay = document.getElementById("totalIncome");
+            const totalExpensesDisplay = document.getElementById("totalExpenses");
+            const balanceDisplay = document.getElementById("balance");
+        
+            let totalIncome = 0;
+            let totalExpenses = 0;
+            let balance = 0;
+            let transactions = [];
+        
+            // Add transaction
+            function addTransaction() {
+                const income = parseFloat(incomeInput.value) || 0;
+                const expense = parseFloat(expenseInput.value) || 0;
+        
+                transactions.push({ income, expense });
+        
+                updateSummary();
+                updateChart();
+        
+                incomeInput.value = "";
+                expenseInput.value = "";
+            }
+        
+            // Update summary
+            function updateSummary() {
+                totalIncome = transactions.reduce((acc, curr) => acc + curr.income, 0);
+                totalExpenses = transactions.reduce((acc, curr) => acc + curr.expense, 0);
+                balance = totalIncome - totalExpenses;
+        
+                totalIncomeDisplay.textContent = totalIncome;
+                totalExpensesDisplay.textContent = totalExpenses;
+                balanceDisplay.textContent = balance;
+            }
+        
+            // Chart.js
+            function updateChart() {
+                const ctx = document.getElementById("myChart").getContext("2d");
+                const labels = transactions.map((_, index) => Transaction ${index + 1});
+                const incomes = transactions.map(transaction => transaction.income);
+                const expenses = transactions.map(transaction => transaction.expense);
+        
+                const chart = new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                        labels,
+                        datasets: [
+                            {
+                                label: "Income",
+                                data: incomes,
+                                backgroundColor: "rgba(54, 162, 235, 0.5)",
+                                borderColor: "rgba(54, 162, 235, 1)",
+                                borderWidth: 1
+                            },
+                            {
+                                label: "Expenses",
+                                data: expenses,
+                                backgroundColor: "rgba(255, 99, 132, 0.5)",
+                                borderColor: "rgba(255, 99, 132, 1)",
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+            }
+        });
+        
+    </script>
+</body>
+</html>
